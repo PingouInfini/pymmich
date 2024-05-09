@@ -1,2 +1,34 @@
 # pymmich
-A fully asynchronous, easy-to-use API client for the Immich API. You can use this client to interact with a number of elements
+
+A fully asynchronous, easy-to-use API client for the Immich API. You can use this client to interact with a number of
+elements
+
+## Install requirements
+
+```bash
+pip install -r requirements.txt
+```
+
+## Getting started
+
+```python
+import asyncio
+from datetime import datetime
+
+from pymmich.client import PymmichClient
+from pymmich.enums.library_type import LibraryType
+
+BASE_URL = "https://immich.mydomain.com"
+API_KEY = "ABCDEFGHIJKLMNOPQRZTUVWXYZ0123456789"
+
+
+async def main() -> None:
+    async with PymmichClient(BASE_URL, API_KEY) as client:
+        albums = await client.get_albums(shared_album=True)
+        libraries = await client.get_libraries(library_type=LibraryType.EXTERNAL)
+        assets = await client.get_assets(updated_after=datetime(2024, 1, 31, 12, 34, 56))
+        # ...
+
+
+asyncio.run(main())
+```
