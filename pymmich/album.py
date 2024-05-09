@@ -71,7 +71,7 @@ def get_albums(self, asset_id=None, shared_album=None):
 
 def create_album(self, album_name, owners_id):
     logging.debug("### Album creation name '" + album_name + "' for users " + str(
-        [get_user_by_id(user_id).get('name') for user_id in owners_id if get_user_by_id(user_id)]))
+        [get_user_by_id(self, user_id).get('name') for user_id in owners_id if get_user_by_id(self, user_id)]))
 
     url = f'{self.base_url}/api/album'
 
