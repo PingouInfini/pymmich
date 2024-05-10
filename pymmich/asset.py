@@ -1,7 +1,9 @@
 import logging
 from datetime import datetime, timezone
+from io import BytesIO
 
 import requests
+from PIL import Image, UnidentifiedImageError
 
 
 def get_assets(self, is_external=None, updated_after: datetime = None):
@@ -43,3 +45,32 @@ def get_assets(self, is_external=None, updated_after: datetime = None):
 
     logging.debug(f"### Response assets : {assets}")
     return assets
+
+
+def download_file(self, asset_id) -> object:
+    logging.debug(f"### Download File with asset_id : {asset_id}")
+
+    url = f'{self.base_url}/api/download/asset/{asset_id}'
+
+    response = requests.post(url, **self.requests_kwargs, verify=True)
+
+    if response.status_code == 200 and 'image/' in response.headers.get('Content-Type', ''):
+        logging.debug(f"### Download File done")
+        image_bytes = BytesIO(response.content)
+        try:
+            image = Image.open(image_bytes)
+            image.load()  # Force loading the image data while the file is open
+            image_bytes.close()  # Now we can safely close the stream
+            return image
+        except UnidentifiedImageError:
+            print(
+                f"Failed to identify image for asset_id {asset_id}. Content-Type: {response.headers.get('Content-Type')}")
+            image_bytes.close()  # Ensure the stream is closed even if an error occurs
+            return None
+        finally:
+            image_bytes.close()  # Ensure the stream is always closed
+            del image_bytes
+    else:
+        logging.error(f'Failed Downloading File with status code {response.status_code}')
+        logging.error(response.text)
+        return None

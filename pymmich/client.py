@@ -70,6 +70,9 @@ class PymmichClient:
     def get_assets(self, is_external=None, updated_after=None) -> object:
         return asset.get_assets(self, is_external, updated_after)
 
+    def download_file(self, asset_id) -> object:
+        return asset.download_file(self, asset_id)
+
     ###################################################################################################################
     # LIBRARY
     ###################################################################################################################
