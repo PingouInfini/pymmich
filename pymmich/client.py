@@ -73,6 +73,9 @@ class PymmichClient:
     def download_file(self, asset_id) -> object:
         return asset.download_file(self, asset_id)
 
+    def delete_assets(self, assets_ids) -> None:
+        return asset.delete_assets(self, assets_ids)
+
     ###################################################################################################################
     # LIBRARY
     ###################################################################################################################

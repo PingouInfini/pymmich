@@ -1,3 +1,4 @@
+import json
 import logging
 from datetime import datetime, timezone
 from io import BytesIO
@@ -72,5 +73,30 @@ def download_file(self, asset_id) -> object:
             del image_bytes
     else:
         logging.error(f'Failed Downloading File with status code {response.status_code}')
+        logging.error(response.text)
+        return None
+
+
+def delete_assets(self, assets_ids) -> None:
+    logging.debug(f"### Delete assets with assets_ids : {assets_ids}")
+
+    url = f'{self.base_url}/api/asset'
+
+    # Creates JSON payload with data
+    payload = {
+        "force": True,
+        "ids": list(assets_ids)
+    }
+
+    # Converts payload to JSON
+    payload = json.dumps(payload)
+
+    response = requests.delete(url, data=payload, **self.requests_kwargs, verify=True)
+
+    if response.status_code == 204:
+        logging.debug(f"### Delete assets done")
+        return None
+    else:
+        logging.error(f'Failed deleting assets with status code {response.status_code}')
         logging.error(response.text)
         return None
