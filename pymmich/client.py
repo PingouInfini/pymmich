@@ -77,6 +77,9 @@ class PymmichClient:
     def get_libraries(self, library_type=None) -> object:
         return library.get_libraries(self, library_type)
 
+    def remove_offline_files(self, library_id) -> None:
+        return library.remove_offline_files(self, library_id)
+
     ###################################################################################################################
     # USER
     ###################################################################################################################
