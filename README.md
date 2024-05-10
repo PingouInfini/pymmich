@@ -1,6 +1,6 @@
 # pymmich
 
-A easy-to-use API client for the Immich API. You can use this client to interact with a number of
+An easy-to-use API client for the Immich API. You can use this client to interact with a number of
 elements
 
 ## Install requirements
