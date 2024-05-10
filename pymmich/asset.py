@@ -1,9 +1,10 @@
 import logging
+from datetime import datetime, timezone
 
 import requests
 
 
-def get_assets(self, is_external=None, updated_after=None):
+def get_assets(self, is_external=None, updated_after: datetime = None):
     logging.debug(f"### Get assets with is_external : {is_external} and updatedAfter : {updated_after}")
 
     assets = []
@@ -14,8 +15,13 @@ def get_assets(self, is_external=None, updated_after=None):
         url = f'{self.base_url}/api/asset?take={number_of_assets_to_fetch_per_request}&skip={skip}'
 
         if updated_after:
-            updated_after = updated_after.strftime("%Y-%m-%d %H:%M:%S")
-            url += f'&updatedAfter={updated_after}'
+            # Converts updated_after to UTC if its timezone is not already UTC
+            if updated_after.tzinfo is not None and updated_after.tzinfo.utcoffset(updated_after) is not None:
+                updated_after = updated_after.astimezone(timezone.utc)
+            else:
+                updated_after = updated_after.replace(tzinfo=timezone.utc)
+
+            url += f'&updatedAfter={updated_after.strftime("%Y-%m-%d %H:%M:%S")}'
 
         response = requests.get(url, **self.requests_kwargs, verify=True)
 
