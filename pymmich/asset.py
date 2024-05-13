@@ -31,7 +31,8 @@ def get_assets(self, is_external=None, updated_after: datetime = None):
         if response.status_code == 200:
             current_assets = response.json()
             if is_external is not None:
-                current_assets = [asset for asset in current_assets if asset.get('isExternal') == is_external]
+                current_assets = [asset for asset in current_assets
+                                  if asset.get('originalPath').startswith("/usr/src/app/external")]
             assets.extend(current_assets)
 
             if len(response.json()) < number_of_assets_to_fetch_per_request:

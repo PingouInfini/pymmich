@@ -75,15 +75,13 @@ def create_album(self, album_name, owners_id):
 
     url = f'{self.base_url}/api/album'
 
-    # TODO Property 'albumUsers' added in v1.104.0
     # Creates a list of dictionaries for albumUsers
-    # album_users = [{"role": "editor", "userId": user_id} for user_id in owners_id]
+    album_users = [{"role": "editor", "userId": user_id} for user_id in owners_id]
 
     # Creates JSON payload with data
     payload = {
         "albumName": album_name,
-        #    "albumUsers": album_users          # TODO Property 'albumUsers' added in v1.104.0
-        "sharedWithUserIds": list(owners_id)  # TODO Property 'sharedWithUserIds' deprecated in v1.104.0
+        "albumUsers": album_users
     }
 
     # Converts payload to JSON
