@@ -1,5 +1,7 @@
 """ Python wrapper for the Immich API """
 from pymmich import album, asset, library, user
+from pymmich.enums.asset_job import AssetJob
+from pymmich.enums.library_type import LibraryType
 
 
 class PymmichClient:
@@ -76,11 +78,14 @@ class PymmichClient:
     def delete_assets(self, assets_ids) -> None:
         return asset.delete_assets(self, assets_ids)
 
+    def run_asset_jobs(self, assets_ids, asset_job: AssetJob = AssetJob.REGENERATE_THUMBNAIL) -> None:
+        return asset.run_asset_jobs(self, assets_ids, asset_job)
+
     ###################################################################################################################
     # LIBRARY
     ###################################################################################################################
 
-    def get_libraries(self, library_type=None) -> object:
+    def get_libraries(self, library_type: LibraryType = None) -> object:
         return library.get_libraries(self, library_type)
 
     def remove_offline_files(self, library_id) -> None:

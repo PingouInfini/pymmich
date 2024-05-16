@@ -6,6 +6,8 @@ from io import BytesIO
 import requests
 from PIL import Image, UnidentifiedImageError
 
+from pymmich.enums.asset_job import AssetJob
+
 
 def get_assets(self, is_external=None, updated_after: datetime = None):
     logging.debug(f"### Get assets with is_external : {is_external} and updatedAfter : {updated_after}")
@@ -99,5 +101,30 @@ def delete_assets(self, assets_ids) -> None:
         return None
     else:
         logging.error(f'Failed deleting assets with status code {response.status_code}')
+        logging.error(response.text)
+        return None
+
+
+def run_asset_jobs(self, assets_ids, asset_job: AssetJob = AssetJob.REGENERATE_THUMBNAIL) -> None:
+    logging.debug(f"### Run asset jobs with assets_ids : {assets_ids} and asset_job : {asset_job}")
+
+    url = f'{self.base_url}/api/asset/jobs'
+
+    # Creates JSON payload with data
+    payload = {
+        "name": asset_job,
+        "assetIds": list(assets_ids)
+    }
+
+    # Converts payload to JSON
+    payload = json.dumps(payload)
+
+    response = requests.post(url, data=payload, **self.requests_kwargs, verify=True)
+
+    if response.status_code == 204:
+        logging.debug(f"### Run asset jobs done")
+        return None
+    else:
+        logging.error(f'Failed running asset jobs with status code {response.status_code}')
         logging.error(response.text)
         return None
