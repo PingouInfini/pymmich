@@ -1,3 +1,4 @@
+import json
 import logging
 
 import requests
@@ -20,6 +21,32 @@ def get_libraries(self, library_type: LibraryType = None) -> object:
         return response.json()
     else:
         logging.error(f'Failed to retrieve libraries with status code {response.status_code}')
+        logging.error(response.text)
+        return None
+
+
+def scan_library(self, library_id, refresh_all_files=False, refresh_modified_files=True) -> object:
+    logging.debug(f"### Scan library with library_id : {library_id} and refresh_all_files : {refresh_all_files} "
+                  f"and refresh_modified_files : {refresh_modified_files}")
+
+    url = f'{self.base_url}/api/library/{library_id}/scan'
+
+    # Creates JSON payload with data
+    payload = {
+        "refreshAllFiles": refresh_all_files,
+        "refreshModifiedFiles": refresh_modified_files
+    }
+
+    # Converts payload to JSON
+    payload = json.dumps(payload)
+
+    response = requests.post(url, data=payload, **self.requests_kwargs, verify=True)
+
+    if response.status_code == 204:
+        logging.debug(f"### Scan library done")
+        return None
+    else:
+        logging.error(f'Failed scanning library with status code {response.status_code}')
         logging.error(response.text)
         return None
 
