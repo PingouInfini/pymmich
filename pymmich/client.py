@@ -88,7 +88,7 @@ class PymmichClient:
     def get_libraries(self, library_type: LibraryType = None) -> object:
         return library.get_libraries(self, library_type)
 
-    def scan_library(self, library_id, refresh_all_files=False, refresh_modified_files=True) -> object:
+    def scan_library(self, library_id, refresh_all_files=None, refresh_modified_files=None) -> object:
         return library.scan_library(self, library_id, refresh_all_files, refresh_modified_files)
 
     def remove_offline_files(self, library_id) -> None:

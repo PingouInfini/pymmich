@@ -25,17 +25,20 @@ def get_libraries(self, library_type: LibraryType = None) -> object:
         return None
 
 
-def scan_library(self, library_id, refresh_all_files=False, refresh_modified_files=True) -> object:
+def scan_library(self, library_id, refresh_all_files=None, refresh_modified_files=None) -> object:
     logging.debug(f"### Scan library with library_id : {library_id} and refresh_all_files : {refresh_all_files} "
                   f"and refresh_modified_files : {refresh_modified_files}")
 
     url = f'{self.base_url}/api/library/{library_id}/scan'
 
     # Creates JSON payload with data
-    payload = {
-        "refreshAllFiles": refresh_all_files,
-        "refreshModifiedFiles": refresh_modified_files
-    }
+    if refresh_all_files is None and refresh_modified_files is None:
+        payload = {}
+    else:
+        payload = {
+            "refreshAllFiles": refresh_all_files if refresh_all_files is not None else False,
+            "refreshModifiedFiles": refresh_modified_files if refresh_modified_files is not None else False
+        }
 
     # Converts payload to JSON
     payload = json.dumps(payload)
