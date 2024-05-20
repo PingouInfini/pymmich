@@ -78,6 +78,9 @@ class PymmichClient:
     def delete_assets(self, assets_ids) -> None:
         return asset.delete_assets(self, assets_ids)
 
+    def get_asset_thumbnail(self, asset_id) -> object:
+        return asset.get_asset_thumbnail(self, asset_id)
+
     def run_asset_jobs(self, assets_ids, asset_job: AssetJob = AssetJob.REGENERATE_THUMBNAIL) -> None:
         return asset.run_asset_jobs(self, assets_ids, asset_job)
 

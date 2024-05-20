@@ -105,6 +105,22 @@ def delete_assets(self, assets_ids) -> None:
         return None
 
 
+def get_asset_thumbnail(self, asset_id) -> object:
+    logging.debug(f"### Get asset thumbnail with asset_id : {asset_id}")
+
+    url = f'{self.base_url}/api/asset/thumbnail/{asset_id}'
+
+    response = requests.get(url, **self.requests_kwargs, verify=True)
+
+    if response.status_code == 200:
+        logging.debug(f"### Response asset thumbnail : {response.content}")
+        return response.content
+    else:
+        logging.error(f'Failed to retrieve asset thumbnail with status code {response.status_code}')
+        logging.error(response.text)
+        return None
+
+
 def run_asset_jobs(self, assets_ids, asset_job: AssetJob = AssetJob.REGENERATE_THUMBNAIL) -> None:
     logging.debug(f"### Run asset jobs with assets_ids : {assets_ids} and asset_job : {asset_job}")
 
