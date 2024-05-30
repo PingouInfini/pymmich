@@ -1,6 +1,7 @@
 """ Python wrapper for the Immich API """
-from pymmich import album, asset, library, user
+from pymmich import album, asset, library, user, job
 from pymmich.enums.asset_job import AssetJob
+from pymmich.enums.job_command import JobCommand
 from pymmich.enums.library_type import LibraryType
 
 
@@ -103,3 +104,10 @@ class PymmichClient:
 
     def get_user_by_id(self, user_id) -> object:
         return user.get_user_by_id(self, user_id)
+
+    ###################################################################################################################
+    # JOB
+    ###################################################################################################################
+
+    def send_job_command(self, job_command: JobCommand, force: bool = False) -> object:
+        return job.send_job_command(self, job_command, force)
