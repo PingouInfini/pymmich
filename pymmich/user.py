@@ -14,6 +14,6 @@ def get_user_by_id(self, user_id):
         logging.debug(f"### Response user : {response.json()}")
         return response.json()
     else:
-        logging.error(f'Failed to retrieve user by id with status code {response.status_code}')
+        logging.error(f'Failed to retrieve user with id {user_id} with status code {response.status_code}')
         logging.error(response.text)
         return None

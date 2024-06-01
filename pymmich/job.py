@@ -33,7 +33,7 @@ def get_job_status(self, job_name: JobName) -> object:
         logging.debug(f"### Response job status : {response.json()}")
         return response.json().get(job_name)
     else:
-        logging.error(f'Failed to retrieve job status with status code {response.status_code}')
+        logging.error(f"Failed to retrieve job {job_name} status with status code {response.status_code}")
         logging.error(response.text)
         return None
 
@@ -61,6 +61,6 @@ def send_job_command(self, job_command: JobName, force: bool = False) -> object:
         logging.debug(f"### Send job command : {response.json()}")
         return response.json()
     else:
-        logging.error(f'Failed to send job command with status code {response.status_code}')
+        logging.error(f"Failed to send job command {job_command} with status code {response.status_code}")
         logging.error(response.text)
         return None

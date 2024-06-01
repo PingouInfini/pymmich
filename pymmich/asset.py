@@ -62,7 +62,7 @@ def get_asset_info(self, asset_id) -> object:
         logging.debug(f"### Response asset info status : {response.json()}")
         return response.json()
     else:
-        logging.error(f'Failed to retrieve asset info status with status code {response.status_code}')
+        logging.error(f'Failed to retrieve asset {asset_id} info status with status code {response.status_code}')
         logging.error(response.text)
         return None
 
@@ -91,7 +91,7 @@ def download_file(self, asset_id) -> object:
             image_bytes.close()  # Ensure the stream is always closed
             del image_bytes
     else:
-        logging.error(f'Failed Downloading File with status code {response.status_code}')
+        logging.error(f'Failed Downloading File {asset_id} with status code {response.status_code}')
         logging.error(response.text)
         return None
 
@@ -116,7 +116,7 @@ def delete_assets(self, assets_ids) -> None:
         logging.debug(f"### Delete assets done")
         return None
     else:
-        logging.error(f'Failed deleting assets with status code {response.status_code}')
+        logging.error(f'Failed deleting assets {assets_ids} with status code {response.status_code}')
         logging.error(response.text)
         return None
 
@@ -132,7 +132,7 @@ def get_asset_thumbnail(self, asset_id) -> object:
         logging.debug(f"### Response asset thumbnail : {response.content}")
         return response.content
     else:
-        logging.error(f'Failed to retrieve asset thumbnail with status code {response.status_code}')
+        logging.error(f'Failed to retrieve asset {asset_id} thumbnail with status code {response.status_code}')
         logging.error(response.text)
         return None
 
@@ -157,6 +157,7 @@ def run_asset_jobs(self, assets_ids, asset_job: AssetJob = AssetJob.REGENERATE_T
         logging.debug(f"### Run asset jobs done")
         return None
     else:
-        logging.error(f'Failed running asset jobs with status code {response.status_code}')
+        logging.error(f'Failed running asset jobs with assets_ids : {assets_ids} and asset_job : {asset_job} '
+                      f'with status code {response.status_code}')
         logging.error(response.text)
         return None

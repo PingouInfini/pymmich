@@ -21,7 +21,7 @@ def get_album(self, album_id=None):
         logging.debug(f"### Response album : {response.json()}")
         return response.json()
     else:
-        logging.error(f'Failed to retrieve album with status code {response.status_code}')
+        logging.error(f'Failed to retrieve album {album_id} with status code {response.status_code}')
         logging.error(response.text)
         return None
 
@@ -64,7 +64,8 @@ def get_albums(self, asset_id=None, shared_album=None):
         logging.debug(f"### Response albums : {response.json()}")
         return response.json()
     else:
-        logging.error(f'Failed to retrieve albums with status code {response.status_code}')
+        logging.error(f'Failed to retrieve albums with asset_id : {asset_id} and shared_album : {shared_album}'
+                      f' with status code {response.status_code}')
         logging.error(response.text)
         return None
 
@@ -93,7 +94,7 @@ def create_album(self, album_name, owners_id):
         logging.debug('Album creation successful')
         return None
     else:
-        logging.error(f'Album creation failed with status code {response.status_code}')
+        logging.error(f'Album {album_name} creation failed with status code {response.status_code}')
         logging.error(response.text)
         return None
 
@@ -117,6 +118,6 @@ def add_assets_to_album(self, album_id, assets_ids):
         logging.debug('Add assets to album successful')
         return None
     else:
-        logging.error(f'Add assets to album failed with status code {response.status_code}')
+        logging.error(f'Add assets to album {album_id} failed with status code {response.status_code}')
         logging.error(response.text)
         return None

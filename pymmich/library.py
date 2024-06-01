@@ -20,7 +20,7 @@ def get_libraries(self, library_type: LibraryType = None) -> object:
         logging.debug(f"### Response libraries : {response.json()}")
         return response.json()
     else:
-        logging.error(f'Failed to retrieve libraries with status code {response.status_code}')
+        logging.error(f'Failed to retrieve libraries {library_type} with status code {response.status_code}')
         logging.error(response.text)
         return None
 
@@ -49,7 +49,7 @@ def scan_library(self, library_id, refresh_all_files=None, refresh_modified_file
         logging.debug(f"### Scan library done")
         return None
     else:
-        logging.error(f'Failed scanning library with status code {response.status_code}')
+        logging.error(f'Failed scanning library {library_id} with status code {response.status_code}')
         logging.error(response.text)
         return None
 
@@ -65,6 +65,6 @@ def remove_offline_files(self, library_id) -> None:
         logging.debug(f"### Remove offline files done")
         return None
     else:
-        logging.error(f'Failed remove offline files with status code {response.status_code}')
+        logging.error(f'Failed remove offline files {library_id} with status code {response.status_code}')
         logging.error(response.text)
         return None
