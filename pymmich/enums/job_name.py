@@ -5,7 +5,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 @unique
-class JobCommand(StrEnum):
+class JobName(StrEnum):
     THUMBNAIL_GENERATION = "thumbnailGeneration"
     METADATA_EXTRACTION = "metadataExtraction"
     VIDEO_CONVERSION = "videoConversion"

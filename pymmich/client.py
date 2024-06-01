@@ -1,7 +1,7 @@
 """ Python wrapper for the Immich API """
 from pymmich import album, asset, library, user, job
 from pymmich.enums.asset_job import AssetJob
-from pymmich.enums.job_command import JobCommand
+from pymmich.enums.job_name import JobName
 from pymmich.enums.library_type import LibraryType
 
 
@@ -109,5 +109,11 @@ class PymmichClient:
     # JOB
     ###################################################################################################################
 
-    def send_job_command(self, job_command: JobCommand, force: bool = False) -> object:
+    def get_all_jobs_status(self) -> object:
+        return job.get_all_jobs_status(self)
+
+    def get_job_status(self, job_name: JobName) -> object:
+        return job.get_job_status(self, job_name)
+
+    def send_job_command(self, job_command: JobName, force: bool = False) -> object:
         return job.send_job_command(self, job_command, force)
