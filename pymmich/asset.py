@@ -51,6 +51,22 @@ def get_assets(self, is_external=None, updated_after: datetime = None):
     return assets
 
 
+def get_asset_info(self, asset_id) -> object:
+    logging.debug(f"### Get asset '{asset_id}' info")
+
+    url = f"{self.base_url}/api/asset/{asset_id}"
+
+    response = requests.get(url, **self.requests_kwargs, verify=True)
+
+    if response.status_code == 200:
+        logging.debug(f"### Response asset info status : {response.json()}")
+        return response.json()
+    else:
+        logging.error(f'Failed to retrieve asset info status with status code {response.status_code}')
+        logging.error(response.text)
+        return None
+
+
 def download_file(self, asset_id) -> object:
     logging.debug(f"### Download File with asset_id : {asset_id}")
 
