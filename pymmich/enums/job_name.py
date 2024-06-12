@@ -19,6 +19,3 @@ class JobName(StrEnum):
     SIDECAR = "sidecar"
     LIBRARY = "library"
     NOTIFICATIONS = "notifications"
-
-
-

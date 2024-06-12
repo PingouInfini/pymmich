@@ -9,52 +9,98 @@ from PIL import Image, UnidentifiedImageError
 from pymmich.enums.asset_job import AssetJob
 
 
-def get_assets(self, is_external=None, updated_after: datetime = None):
-    logging.debug(f"### Get assets with is_external : {is_external} and updatedAfter : {updated_after}")
+def get_all_user_assets_by_device_id(self, device_id) -> object:
+    logging.debug(f"### Get all user assets with device_id : {device_id}")
 
-    assets = []
-    number_of_assets_to_fetch_per_request = 100
-    skip = 0
+    url = f"{self.base_url}/api/assets/device/{device_id}"
 
-    while True:
-        url = f'{self.base_url}/api/asset?take={number_of_assets_to_fetch_per_request}&skip={skip}'
+    response = requests.get(url, **self.requests_kwargs, verify=True)
 
-        if updated_after:
-            # Converts updated_after to UTC if its timezone is not already UTC
-            if updated_after.tzinfo is not None and updated_after.tzinfo.utcoffset(updated_after) is not None:
-                updated_after = updated_after.astimezone(timezone.utc)
-            else:
-                updated_after = updated_after.replace(tzinfo=timezone.utc)
+    if response.status_code == 200:
+        logging.debug(f"### Response all user assets : {response.json()}")
+        return response.json()
+    else:
+        logging.error(f'Failed to retrieve all user assets with device_id : {device_id} '
+                      f'with status code {response.status_code}')
+        logging.error(response.text)
+        return None
 
-            url += f'&updatedAfter={updated_after.strftime("%Y-%m-%d %H:%M:%S")}'
 
-        response = requests.get(url, **self.requests_kwargs, verify=True)
+def get_full_sync_for_user(self, user_id, last_asset_id=None, updated_until=None, updated_after=None, limit=100,
+                           is_external: bool = False) -> object:
+    logging.debug(f"### Get full sync for user with user_id : {user_id}, last_asset_id : {last_asset_id}, "
+                  f"updated_until : {updated_until}, updated_after : {updated_after}, limit : {limit} and "
+                  f"is_external : {is_external}")
 
-        if response.status_code == 200:
-            current_assets = response.json()
-            if is_external is not None:
-                current_assets = [asset for asset in current_assets
-                                  if asset.get('originalPath').startswith("/usr/src/app/external")]
-            assets.extend(current_assets)
+    if not updated_until:
+        updated_until = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
-            if len(response.json()) < number_of_assets_to_fetch_per_request:
-                break
-            else:
-                skip += number_of_assets_to_fetch_per_request
+    try:
+        datetime.strptime(updated_until, '%Y-%m-%dT%H:%M:%S.%fZ')
+    except ValueError:
+        raise ValueError(f"The updated_until parameter '{updated_until}' does not respect the expected format "
+                         f"'%Y-%m-%dT%H:%M:%S.%fZ'")
 
+    if updated_after is not None:
+        # Converts updated_after to UTC if its timezone is not already UTC
+        if updated_after.tzinfo is not None and updated_after.tzinfo.utcoffset(updated_after) is not None:
+            updated_after = updated_after.astimezone(timezone.utc)
         else:
-            logging.error(f'Failed to retrieve assets with status code {response.status_code}')
-            logging.error(response.text)
-            return None
+            updated_after = updated_after.replace(tzinfo=timezone.utc)
 
-    logging.debug(f"### Response assets : {assets}")
-    return assets
+    url = f'{self.base_url}/api/sync/full-sync'
+
+    # Creates JSON payload with data
+    payload = {
+        "lastId": last_asset_id,
+        "limit": limit,
+        "updatedUntil": updated_until,
+        "userId": user_id
+    }
+
+    if last_asset_id is None:
+        del payload["lastId"]
+
+    # Converts payload to JSON
+    payload = json.dumps(payload)
+
+    response = requests.post(url, data=payload, **self.requests_kwargs, verify=True)
+
+    if response.status_code == 200:
+        response_data = response.json()
+        if updated_after is not None:
+            response_data = [item for item in response_data if
+                             datetime.strptime(item['updatedAt'], '%Y-%m-%dT%H:%M:%S.%fZ').replace(
+                                 tzinfo=timezone.utc) >= updated_after]
+        if is_external:
+            response_data = [item for item in response_data if item['originalPath'].startswith('/usr/src/app/external')]
+
+        return response_data
+    else:
+        logging.error(f'Failed with status code {response.status_code}')
+        logging.error(response.text)
+
+
+def get_random(self, count=1) -> object:
+    logging.debug(f"### Get random asset with count : {count}")
+
+    url = f"{self.base_url}/api/assets/random?count={count}"
+
+    response = requests.get(url, **self.requests_kwargs, verify=True)
+
+    if response.status_code == 200:
+        logging.debug(f"### Response random asset : {response.json()}")
+        return response.json()
+    else:
+        logging.error(f'Failed to retrieve random asset with status code {response.status_code}')
+        logging.error(response.text)
+        return None
 
 
 def get_asset_info(self, asset_id) -> object:
     logging.debug(f"### Get asset '{asset_id}' info")
 
-    url = f"{self.base_url}/api/asset/{asset_id}"
+    url = f"{self.base_url}/api/assets/{asset_id}"
 
     response = requests.get(url, **self.requests_kwargs, verify=True)
 
@@ -67,12 +113,12 @@ def get_asset_info(self, asset_id) -> object:
         return None
 
 
-def download_file(self, asset_id) -> object:
+def download_asset(self, asset_id) -> object:
     logging.debug(f"### Download File with asset_id : {asset_id}")
 
-    url = f'{self.base_url}/api/download/asset/{asset_id}'
+    url = f'{self.base_url}/api/assets/{asset_id}/original'
 
-    response = requests.post(url, **self.requests_kwargs, verify=True)
+    response = requests.get(url, **self.requests_kwargs, verify=True)
 
     if response.status_code == 200 and 'image/' in response.headers.get('Content-Type', ''):
         logging.debug(f"### Download File done")
@@ -86,20 +132,19 @@ def download_file(self, asset_id) -> object:
             print(
                 f"Failed to identify image for asset_id {asset_id}. Content-Type: {response.headers.get('Content-Type')}")
             image_bytes.close()  # Ensure the stream is closed even if an error occurs
-            return None
+            return False
         finally:
             image_bytes.close()  # Ensure the stream is always closed
             del image_bytes
     else:
         logging.error(f'Failed Downloading File {asset_id} with status code {response.status_code}')
-        logging.error(response.text)
-        return None
+        return False
 
 
-def delete_assets(self, assets_ids) -> None:
+def delete_assets(self, assets_ids) -> bool:
     logging.debug(f"### Delete assets with assets_ids : {assets_ids}")
 
-    url = f'{self.base_url}/api/asset'
+    url = f'{self.base_url}/api/assets'
 
     # Creates JSON payload with data
     payload = {
@@ -114,17 +159,17 @@ def delete_assets(self, assets_ids) -> None:
 
     if response.status_code == 204:
         logging.debug(f"### Delete assets done")
-        return None
+        return True
     else:
         logging.error(f'Failed deleting assets {assets_ids} with status code {response.status_code}')
         logging.error(response.text)
-        return None
+        return False
 
 
-def get_asset_thumbnail(self, asset_id) -> object:
+def view_asset(self, asset_id) -> object:
     logging.debug(f"### Get asset thumbnail with asset_id : {asset_id}")
 
-    url = f'{self.base_url}/api/asset/thumbnail/{asset_id}'
+    url = f'{self.base_url}/api/assets/{asset_id}/thumbnail'
 
     response = requests.get(url, **self.requests_kwargs, verify=True)
 
@@ -137,10 +182,10 @@ def get_asset_thumbnail(self, asset_id) -> object:
         return None
 
 
-def run_asset_jobs(self, assets_ids, asset_job: AssetJob = AssetJob.REGENERATE_THUMBNAIL) -> None:
+def run_asset_jobs(self, assets_ids, asset_job: AssetJob = AssetJob.REGENERATE_THUMBNAIL) -> bool:
     logging.debug(f"### Run asset jobs with assets_ids : {assets_ids} and asset_job : {asset_job}")
 
-    url = f'{self.base_url}/api/asset/jobs'
+    url = f'{self.base_url}/api/assets/jobs'
 
     # Creates JSON payload with data
     payload = {
@@ -155,9 +200,9 @@ def run_asset_jobs(self, assets_ids, asset_job: AssetJob = AssetJob.REGENERATE_T
 
     if response.status_code == 204:
         logging.debug(f"### Run asset jobs done")
-        return None
+        return True
     else:
         logging.error(f'Failed running asset jobs with assets_ids : {assets_ids} and asset_job : {asset_job} '
                       f'with status code {response.status_code}')
         logging.error(response.text)
-        return None
+        return False
