@@ -18,8 +18,8 @@ class TestPymmichClient(unittest.TestCase):
         expected_asset_keys = {
             'id', 'deviceAssetId', 'ownerId', 'deviceId', 'libraryId', 'type', 'originalPath', 'originalFileName',
             'resized', 'thumbhash', 'fileCreatedAt', 'fileModifiedAt', 'localDateTime', 'updatedAt', 'isFavorite',
-            'isArchived', 'isTrashed', 'duration', 'exifInfo', 'livePhotoVideoId', 'people', 'checksum', 'stackCount',
-            'isOffline', 'hasMetadata', 'duplicateId'
+            'isArchived', 'isTrashed', 'duration', 'exifInfo', 'livePhotoVideoId', 'people', 'checksum', 'isOffline',
+            'hasMetadata', 'duplicateId'
         }
         self.assertTrue(expected_asset_keys.issubset(asset.keys()))
 
@@ -220,11 +220,6 @@ class TestPymmichClient(unittest.TestCase):
     def test_scan_library(self):
         library = self.client.library.get_libraries()[0]
         response = self.client.library.scan_library(library.get('id'))
-        self.assertTrue(response)
-
-    def test_remove_offline_files(self):
-        library = self.client.library.get_libraries()[0]
-        response = self.client.library.remove_offline_files(library.get('id'))
         self.assertTrue(response)
 
     ###################################################################################################################

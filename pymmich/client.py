@@ -86,9 +86,6 @@ class LibraryClient:
     def scan_library(self, library_id, refresh_all_files=None, refresh_modified_files=None) -> bool:
         return library.scan_library(self.parent_client, library_id, refresh_all_files, refresh_modified_files)
 
-    def remove_offline_files(self, library_id) -> bool:
-        return library.remove_offline_files(self.parent_client, library_id)
-
 
 class UserClient:
     def __init__(self, parent_client):

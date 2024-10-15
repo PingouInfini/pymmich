@@ -52,19 +52,3 @@ def scan_library(self, library_id, refresh_all_files=None, refresh_modified_file
         logging.error(f'Failed scanning library {library_id} with status code {response.status_code}')
         logging.error(response.text)
         return False
-
-
-def remove_offline_files(self, library_id) -> bool:
-    logging.debug(f"### Remove Offline Files with library_id : {library_id}")
-
-    url = f'{self.base_url}/api/libraries/{library_id}/removeOffline'
-
-    response = requests.post(url, **self.requests_kwargs, verify=True)
-
-    if response.status_code == 204:
-        logging.debug(f"### Remove offline files done")
-        return True
-    else:
-        logging.error(f'Failed remove offline files {library_id} with status code {response.status_code}')
-        logging.error(response.text)
-        return False
